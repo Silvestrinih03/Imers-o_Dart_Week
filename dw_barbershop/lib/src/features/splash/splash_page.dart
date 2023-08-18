@@ -1,15 +1,83 @@
+// ignore_for_file: must_call_super
+
+import 'package:dw_barbershop/src/features/splash/auth/login/login_page.dart';
 import 'package:flutter/material.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
+
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  var _scale = 10.0;
+  var _animationOpacityLogo = 0.0;
+
+  double get _LogoAnimationWidth => 100 * _scale;
+  double get _LogoAnimationHeight => 120 * _scale;
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _animationOpacityLogo = 1.0;
+        _scale = 1;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Splash'),
+      backgroundColor: Colors.black,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(
+                'assets/images/background_image_chair.jpg',
+              ),
+              opacity: 0.2,
+              fit: BoxFit.cover),
+        ),
+        child: Center(
+          child: AnimatedOpacity(
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeIn,
+            opacity: _animationOpacityLogo,
+            onEnd: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  PageRouteBuilder(
+                    settings: const RouteSettings(name: 'auth/login'),
+                    pageBuilder: (
+                      context,
+                      animation,
+                      secondaryAnimation,
+                    ) {
+                      return const LoginPage();
+                    },
+                    transitionsBuilder: (_, animation, __, child) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                  ),
+                  (route) => false);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(seconds: 1),
+              width: _LogoAnimationWidth,
+              height: _LogoAnimationHeight,
+              curve: Curves.linearToEaseOut,
+              child: Image.asset(
+                'assets/images/imgLogo.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
       ),
-      body: Container(),
     );
   }
 }
